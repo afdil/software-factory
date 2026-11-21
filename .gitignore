@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+!.env.factory.example
 *.pem
 *.key
 

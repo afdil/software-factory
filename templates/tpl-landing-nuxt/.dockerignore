@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+.factory
+node_modules
+.nuxt
+.output
+e2e
+README.md

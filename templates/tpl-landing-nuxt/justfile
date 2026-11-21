@@ -1,0 +1,14 @@
+set dotenv-load := true
+set windows-shell := ["cmd.exe", "/c"]
+
+fe-check:
+    pnpm run typecheck
+    pnpm run build
+
+e2e:
+    pnpm --dir e2e test
+
+verify-all: fe-check
+
+dev:
+    pnpm dev

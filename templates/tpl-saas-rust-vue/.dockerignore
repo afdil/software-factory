@@ -1,0 +1,10 @@
+.git
+.env
+.env.*
+.factory
+backend/target
+frontend/node_modules
+frontend/dist
+e2e
+docker-compose.dev.yml
+README.md

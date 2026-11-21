@@ -1,0 +1,25 @@
+set dotenv-load := true
+set windows-shell := ["cmd.exe", "/c"]
+
+db-up:
+    docker compose -f docker-compose.dev.yml up -d --wait
+
+db-down:
+    docker compose -f docker-compose.dev.yml down
+
+db-reset:
+    docker compose -f docker-compose.dev.yml down -v
+    docker compose -f docker-compose.dev.yml up -d --wait
+
+be-check:
+    cargo fmt --manifest-path backend/Cargo.toml -- --check
+    cargo clippy --manifest-path backend/Cargo.toml --all-targets -- -D warnings
+    cargo test --manifest-path backend/Cargo.toml
+
+gen-api:
+    cargo run --manifest-path backend/Cargo.toml --bin export_openapi
+
+verify-all: be-check gen-api
+
+dev-be:
+    cargo run --manifest-path backend/Cargo.toml

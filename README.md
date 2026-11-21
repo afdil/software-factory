@@ -85,4 +85,16 @@ WAVE FINAL — TIERED VERIFICATION & RELEASE
 - `contracts/` — Canonical `.factory/` protocol, Markdown templates, and JSON Schemas shared across all bots.
 - `bots/<bot-id>/` — `SOUL.md` (strict role persona, SOP, boundaries) and `MEMORY.md` (cross-project lessons learned) for each of the 8 Orca bots.
 - `skills/` — Custom local agent skills authored specifically for this factory.
-- `scripts/` — Setup and helper scripts (`install-skills.ps1`; later `factory-init` and `coolify-deploy`).
+- `templates/` — Three Golden Templates (`tpl-saas-rust-vue`, `tpl-landing-nuxt`, `tpl-service-rust`) with Coolify-ready Dockerfiles, `justfile`, and Playwright smoke tests.
+- `scripts/` — Deterministic tooling (`install-skills.ps1`, `factory-init.ps1`, `coolify-deploy.ps1`).
+- `.env.factory.example` — Template for Coolify operator environment variables (copy to `.env.factory` for `devops` only; never commit).
+
+---
+
+## Host Machine Prerequisites
+
+- **Orca Desktop** + **GitHub CLI (`gh`)** authenticated (`gh auth login`)
+- **Docker Desktop** (for local PostgreSQL test databases and image verification)
+- **Node.js 22+ & `pnpm`** (for Vue/Nuxt builds and Playwright)
+- **Rust toolchain (`rustup` / `cargo`) + `just`** *(and optionally `sccache` + `cargo-audit` for faster builds and security audits)*
+- **Coolify VPS** with wildcard DNS (`*.apps.yourdomain.com`) and Coolify GitHub App connected
