@@ -1,15 +1,13 @@
 <#
 .SYNOPSIS
-    Deploys and syncs all 8 Software Factory bots into Orca Desktop (~/.orca/bots/<slug>).
+    Syncs SOUL.md, MEMORY.md, and isolated per-bot skills into officially registered Orca Desktop bots.
 .DESCRIPTION
-    Creates or updates each bot folder in ~/.orca/bots/<slug> with Orca's native layout:
-    bot.json (preserving existing UUID), AGENTS.md, CLAUDE.md, SOUL.md, MEMORY.md (only created
-    if missing unless -ResetMemory is passed), memory/, and strictly isolated per-bot skills
-    copied from ~/.agents/skills into ~/.orca/bots/<slug>/.agents/skills/.
+    Queries `orca bot list --json` so it ONLY updates bots that have been created through Orca
+    Desktop's UI (never modifies Orca-managed bot.json, AGENTS.md, or CLAUDE.md, and never creates
+    unregistered folders that could cause `-2` folder duplicates).
 #>
 param(
-    [switch]$ResetMemory,
-    [string]$AgentId = "antigravity"
+    [switch]$ResetMemory
 )
 
 $ErrorActionPreference = "Stop"
@@ -17,127 +15,136 @@ $FactoryRoot = Split-Path -Parent $PSScriptRoot
 $OrcaBotsRoot = Join-Path $env:USERPROFILE ".orca\bots"
 $GlobalSkillsRoot = Join-Path $env:USERPROFILE ".agents\skills"
 
-if (-not (Test-Path $OrcaBotsRoot)) {
-    New-Item -ItemType Directory -Path $OrcaBotsRoot -Force | Out-Null
-}
-
 $BotSpecs = @(
     @{
         Slug   = "project-manager"
         Name   = "Project Manager"
-        Avatar = "mascot:A1"
         Skills = @("orca-cli", "orchestration", "factory-protocol")
     },
     @{
         Slug   = "architect"
         Name   = "Architect"
-        Avatar = "mascot:B1"
         Skills = @("grill-with-docs", "grill-me", "karpathy-guidelines", "factory-protocol")
     },
     @{
         Slug   = "ui-designer"
         Name   = "UI Designer"
-        Avatar = "mascot:C1"
         Skills = @("frontend-design", "shadcn-vue-skilld", "orca-cli")
     },
     @{
         Slug   = "rust-dev"
         Name   = "Rust Dev"
-        Avatar = "mascot:D1"
         Skills = @("orchestration", "karpathy-guidelines", "rust-axum-sqlx")
     },
     @{
         Slug   = "vue-dev"
         Name   = "Vue Dev"
-        Avatar = "mascot:E1"
         Skills = @("orchestration", "karpathy-guidelines", "vue-best-practices", "vue-skilld", "vue-router-best-practices", "pinia", "shadcn-vue-skilld", "vite", "nuxt", "nuxt-seo")
     },
     @{
         Slug   = "qa-tester"
         Name   = "QA Tester"
-        Avatar = "mascot:F1"
         Skills = @("orca-cli", "web-qa-checklist", "playwright-cli", "vue-testing-best-practices")
     },
     @{
         Slug   = "satpam"
         Name   = "Satpam"
-        Avatar = "mascot:G1"
         Skills = @("security-audit", "rust-vue-security")
     },
     @{
         Slug   = "devops"
         Name   = "DevOps"
-        Avatar = "mascot:H2"
         Skills = @("orca-cli", "coolify-deploy")
     }
 )
 
-$Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
-$Summary = @()
+# 1. Discover officially registered bots via Orca CLI
+$rawList = orca bot list --json
+if ($LASTEXITCODE -ne 0) {
+    throw "Failed to run 'orca bot list --json'. Make sure Orca Desktop is running."
+}
+$parsed = $rawList | ConvertFrom-Json
+if (-not $parsed.ok) {
+    throw "Orca returned an error: $($parsed.error.message)"
+}
 
-foreach ($bot in $BotSpecs) {
-    $slug = $bot.Slug
-    $srcBotDir = Join-Path $FactoryRoot "bots\$slug"
-    $dstBotDir = Join-Path $OrcaBotsRoot $slug
-    $dstMemoryDir = Join-Path $dstBotDir "memory"
-    $dstSkillsDir = Join-Path $dstBotDir ".agents\skills"
-
-    New-Item -ItemType Directory -Path $dstBotDir -Force | Out-Null
-    New-Item -ItemType Directory -Path $dstMemoryDir -Force | Out-Null
-    New-Item -ItemType Directory -Path $dstSkillsDir -Force | Out-Null
-
-    # 1. bot.json (preserve existing UUID if bot already exists)
-    $botJsonPath = Join-Path $dstBotDir "bot.json"
-    $botId = [guid]::NewGuid().ToString()
-    if (Test-Path $botJsonPath) {
+# Build map of bot.json id -> folder path on disk
+$FolderById = @{}
+$FolderByName = @{}
+Get-ChildItem -Path $OrcaBotsRoot -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+    $bj = Join-Path $_.FullName "bot.json"
+    if (Test-Path $bj) {
         try {
-            $existing = Get-Content $botJsonPath -Raw | ConvertFrom-Json
-            if ($existing.id) { $botId = $existing.id }
+            $meta = Get-Content $bj -Raw | ConvertFrom-Json
+            if ($meta.id) { $FolderById[$meta.id] = $_.FullName }
+            if ($meta.name) { $FolderByName[$meta.name.ToLowerInvariant()] = $_.FullName }
         } catch {}
     }
+}
 
-    $botJson = [ordered]@{
-        id      = $botId
-        name    = $bot.Name
-        agent   = $AgentId
-        avatar  = $bot.Avatar
-        members = @()
+$RegisteredByName = @{}
+foreach ($b in $parsed.result.bots) {
+    $RegisteredByName[$b.name.ToLowerInvariant()] = $b
+}
+
+$Summary = @()
+
+foreach ($spec in $BotSpecs) {
+    $key = $spec.Name.ToLowerInvariant()
+    $reg = $RegisteredByName[$key]
+    if (-not $reg) {
+        $Summary += [PSCustomObject]@{
+            Bot          = $spec.Name
+            Status       = "NOT_CREATED_IN_ORCA"
+            Folder       = "-"
+            SkillsSynced = 0
+            Missing      = "-"
+        }
+        continue
     }
-    [System.IO.File]::WriteAllText($botJsonPath, ($botJson | ConvertTo-Json -Depth 4), $Utf8NoBom)
 
-    # 2. AGENTS.md & CLAUDE.md (Orca native stubs)
-    $agentsMd = @"
-# $($bot.Name)
+    $dstBotDir = $FolderById[$reg.id]
+    if (-not $dstBotDir) { $dstBotDir = $FolderByName[$key] }
+    if (-not $dstBotDir -or -not (Test-Path $dstBotDir)) {
+        $Summary += [PSCustomObject]@{
+            Bot          = $spec.Name
+            Status       = "FOLDER_NOT_FOUND"
+            Folder       = "-"
+            SkillsSynced = 0
+            Missing      = "-"
+        }
+        continue
+    }
 
-You are $($bot.Name), a bot that runs in Orca. This folder is your home.
+    $srcBotDir = Join-Path $FactoryRoot "bots\$($spec.Slug)"
+    $dstSkillsDir = Join-Path $dstBotDir ".agents\skills"
+    New-Item -ItemType Directory -Path $dstSkillsDir -Force | Out-Null
 
-- SOUL.md says who you are and how you work. Change it only when your owner asks.
-- MEMORY.md is your memory: one line per fact, details in memory/<topic>.md.
-- Keep it current: date new lines, never store secrets. Remove or replace a line with ``orca bot memory forget --fact "<its words>"``; a line taken out any other way is put back.
-
-Orca writes this file, CLAUDE.md and bot.json; edits to them are replaced.
-"@
-    [System.IO.File]::WriteAllText((Join-Path $dstBotDir "AGENTS.md"), $agentsMd, $Utf8NoBom)
-    [System.IO.File]::WriteAllText((Join-Path $dstBotDir "CLAUDE.md"), "@AGENTS.md", $Utf8NoBom)
-
-    # 3. SOUL.md (always synced from software-factory/bots/<slug>/SOUL.md)
+    # Sync SOUL.md (never touch bot.json, AGENTS.md, or CLAUDE.md)
     Copy-Item -Force (Join-Path $srcBotDir "SOUL.md") (Join-Path $dstBotDir "SOUL.md")
 
-    # 4. MEMORY.md (seed on first install; preserve runtime memory unless -ResetMemory)
+    # Seed MEMORY.md only if empty/default or when -ResetMemory is passed
     $dstMemFile = Join-Path $dstBotDir "MEMORY.md"
-    if ($ResetMemory -or -not (Test-Path $dstMemFile)) {
+    $shouldSeedMemory = $ResetMemory -or (-not (Test-Path $dstMemFile))
+    if (-not $shouldSeedMemory) {
+        $existingMem = Get-Content $dstMemFile -Raw
+        if ($existingMem -notmatch '(?m)^-\s+\d{4}-\d{2}-\d{2}\s+') {
+            $shouldSeedMemory = $true
+        }
+    }
+    if ($shouldSeedMemory) {
         Copy-Item -Force (Join-Path $srcBotDir "MEMORY.md") $dstMemFile
     }
 
-    # 5. Strictly sync per-bot isolated skills into .agents/skills/
+    # Strictly sync isolated per-bot skills
     Get-ChildItem -Path $dstSkillsDir -Directory -ErrorAction SilentlyContinue | ForEach-Object {
-        if ($bot.Skills -notcontains $_.Name) {
+        if ($spec.Skills -notcontains $_.Name) {
             Remove-Item -Recurse -Force $_.FullName
         }
     }
 
     $missing = @()
-    foreach ($skillName in $bot.Skills) {
+    foreach ($skillName in $spec.Skills) {
         $srcSkill = Join-Path $GlobalSkillsRoot $skillName
         $dstSkill = Join-Path $dstSkillsDir $skillName
         if (-not (Test-Path $srcSkill)) {
@@ -151,13 +158,13 @@ Orca writes this file, CLAUDE.md and bot.json; edits to them are replaced.
     }
 
     $Summary += [PSCustomObject]@{
-        Bot           = $slug
-        Name          = $bot.Name
-        Agent         = $AgentId
-        SkillsSynced  = ($bot.Skills.Count - $missing.Count)
-        MissingSkills = ($missing -join ", ")
+        Bot          = $spec.Name
+        Status       = "SYNCED"
+        Folder       = Split-Path -Leaf $dstBotDir
+        SkillsSynced = ($spec.Skills.Count - $missing.Count)
+        Missing      = ($missing -join ", ")
     }
 }
 
-Write-Host "`n==> Synced 8 Software Factory bots to $OrcaBotsRoot" -ForegroundColor Green
+Write-Host "`n==> Orca Bot Sync Report" -ForegroundColor Green
 $Summary | Format-Table -AutoSize
