@@ -1,0 +1,151 @@
+# Software Factory Model & Reasoning Effort Configuration
+# Updated: 2026-11-22 (Subscription-matched: Gemini 4 Neon & Gemini 4 Hydrogen)
+# Switch `active_provider` between `gemini` and `claude` when quotas change.
+
+active_provider: gemini
+secondary_provider: claude
+
+notes:
+  - Gemini is currently the active usable provider (Claude is on weekly limit standby).
+  - Active subscription uses Gemini 4 Neon (`gemini-4-neon`) and Gemini 4 Hydrogen (`gemini-4-hydrogen`) — no Gemini 4 Carbon access.
+  - Each bot also retains a Gemini 3 CLI fallback alias if needed on older CLI routing tiers.
+  - Verify exact selectable IDs in Orca once running via `orca agent installed --json`.
+  - All bots MUST operate strictly in English regardless of user input language.
+
+providers:
+  gemini:
+    agent_cli: gemini
+    tiers:
+      frontier_xhigh:
+        label: Gemini 4 Neon (XHigh)
+        model_id: gemini-4-neon
+        effort: xhigh
+      frontier_high:
+        label: Gemini 4 Neon (High)
+        model_id: gemini-4-neon
+        effort: high
+      coder_fast_high:
+        label: Gemini 4 Hydrogen (High)
+        model_id: gemini-4-hydrogen
+        effort: high
+      fast_medium:
+        label: Gemini 4 Hydrogen (Medium)
+        model_id: gemini-4-hydrogen
+        effort: medium
+
+  claude:
+    agent_cli: claude
+    tiers:
+      frontier:
+        label: Claude Opus 5.5 (High)
+        model_id: claude-opus-5-5
+        effort: high
+      strong_coder:
+        label: Claude Sonnet 5.5 (Medium-High)
+        model_id: claude-sonnet-5-5
+        effort: medium
+      economical:
+        label: Claude Haiku 5.5 (Low-Medium)
+        model_id: claude-haiku-5-5
+        effort: low
+
+bots:
+  project-manager:
+    display_name: Project Manager
+    tier: fast_medium
+    gemini:
+      model_id: gemini-4-hydrogen
+      effort: medium
+      fallback_model_id: gemini-3.8-flash
+    claude:
+      model_id: claude-sonnet-5-5
+      effort: medium
+    rationale: Fast, reliable agentic orchestration, wave DAG supervision, and branch coordination.
+
+  architect:
+    display_name: Architect
+    tier: frontier_xhigh
+    gemini:
+      model_id: gemini-4-neon
+      effort: xhigh
+      fallback_model_id: gemini-3.1-pro-preview
+    claude:
+      model_id: claude-opus-5-5
+      effort: high
+    rationale: Highest ROI step; maximum reasoning depth on Neon prevents flawed schemas, bloated specs, and overlapping file_scope DAGs.
+
+  ui-designer:
+    display_name: UI Designer
+    tier: frontier_high
+    gemini:
+      model_id: gemini-4-neon
+      effort: high
+      fallback_model_id: gemini-3.1-pro-preview
+    claude:
+      model_id: claude-opus-5-5
+      effort: medium
+    rationale: Frontier multimodal intelligence tuned for polished visual design systems, typography, and interactive mockup critique.
+
+  rust-dev:
+    display_name: Rust Dev
+    tier: frontier_high
+    gemini:
+      model_id: gemini-4-neon
+      effort: medium
+      complex_task_model_id: gemini-4-neon
+      complex_task_effort: high
+      fallback_model_id: gemini-3.1-pro-preview
+    claude:
+      model_id: claude-sonnet-5-5
+      effort: medium
+      complex_task_effort: high
+    rationale: Strong Rust/Axum/SQLx type-system reasoning on Neon Medium; escalate to Neon High for complex concurrency or domain logic.
+
+  vue-dev:
+    display_name: Vue Dev
+    tier: coder_fast_high
+    gemini:
+      model_id: gemini-4-hydrogen
+      effort: high
+      fallback_model_id: gemini-3.8-flash
+    claude:
+      model_id: claude-sonnet-5-5
+      effort: medium
+    rationale: High-speed everyday coding with high effort for clean Vue 3 SFCs, generated OpenAPI TypeScript clients, shadcn-vue, and Nuxt SEO.
+
+  qa-tester:
+    display_name: QA Tester
+    tier: fast_medium
+    gemini:
+      model_id: gemini-4-hydrogen
+      effort: medium
+      fallback_model_id: gemini-3.8-flash
+    claude:
+      model_id: claude-haiku-5-5
+      effort: low
+      flaky_debug_effort: medium
+    rationale: Fast, economical Hydrogen at medium effort handles repetitive Playwright E2E loops, DOM snapshots, and long logs reliably.
+
+  satpam:
+    display_name: Satpam
+    tier: frontier_xhigh
+    gemini:
+      model_id: gemini-4-neon
+      effort: xhigh
+      fallback_model_id: gemini-3.1-pro-preview
+    claude:
+      model_id: claude-opus-5-5
+      effort: high
+    rationale: Maximum adversarial reasoning on Neon XHigh; runs only 1-2 times per project for Cloudflare's 6-phase security audit.
+
+  devops:
+    display_name: DevOps
+    tier: fast_medium
+    gemini:
+      model_id: gemini-4-hydrogen
+      effort: medium
+      fallback_model_id: gemini-3.8-flash
+    claude:
+      model_id: claude-haiku-5-5
+      effort: low
+    rationale: Fast, reliable execution for deterministic Coolify REST API wrappers, status polling, and build/healthcheck log triage.

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Coolify Deployment Output Schema",
+  "type": "object",
+  "required": [
+    "project_slug",
+    "project_type",
+    "repo_url",
+    "deployed_commit",
+    "coolify_project_uuid",
+    "coolify_app_uuid",
+    "live_url",
+    "smoke_test",
+    "deployed_at"
+  ],
+  "properties": {
+    "project_slug": { "type": "string" },
+    "project_type": { "type": "string", "enum": ["saas", "landing", "service"] },
+    "repo_url": { "type": "string", "format": "uri" },
+    "deployed_commit": { "type": "string" },
+    "coolify_project_uuid": { "type": "string" },
+    "coolify_app_uuid": { "type": "string" },
+    "coolify_db_uuid": { "type": ["string", "null"] },
+    "live_url": { "type": "string", "format": "uri" },
+    "health_url": { "type": "string", "format": "uri" },
+    "smoke_test": {
+      "type": "object",
+      "required": ["status", "http_code", "checked_at"],
+      "properties": {
+        "status": { "type": "string", "enum": ["PASS", "FAIL"] },
+        "http_code": { "type": "integer" },
+        "db_connected": { "type": ["boolean", "null"] },
+        "browser_screenshot_path": { "type": ["string", "null"] },
+        "checked_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "deployed_at": { "type": "string", "format": "date-time" }
+  }
+}

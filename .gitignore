@@ -1,0 +1,18 @@
+# Environment & secrets (never commit Coolify tokens or keys)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Generated workspaces & runtime artifacts
+projects/
+*.log
+tmp/
+
+# OS & editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

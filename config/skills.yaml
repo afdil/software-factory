@@ -1,0 +1,130 @@
+# Per-Bot Skill Matrix & Installation Sources
+# Run scripts/install-skills.ps1 to install external skills and verify local skills.
+
+skill_sources:
+  # Built-in Orca Desktop skills (installed via `orca skills install`)
+  orca-cli:
+    type: orca_builtin
+    install: "orca skills install orca-cli"
+  orchestration:
+    type: orca_builtin
+    install: "orca skills install orchestration"
+
+  # External community / official skills
+  grill-with-docs:
+    type: external
+    repo: "https://github.com/mattpocock/skills"
+    install: "npx skills add mattpocock/skills --skill grill-with-docs"
+    optional_companion: "npx skills add mattpocock/skills --skill grill-me"
+  frontend-design:
+    type: external
+    repo: "https://github.com/anthropics/skills"
+    install: "npx skills add https://github.com/anthropics/skills --skill frontend-design"
+    notes: "Replaces generic UI design skills (e.g., ui-ux-pro-max) to avoid conflicting design philosophies."
+  security-audit:
+    type: external
+    repo: "https://github.com/cloudflare/security-audit-skill"
+    install: "npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit"
+    notes: "Cloudflare's 6-phase vulnerability discovery harness."
+  karpathy-guidelines:
+    type: external
+    repo: "https://github.com/multica-ai/andrej-karpathy-skills"
+    install: "npx skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines"
+    notes: "Applied to architect, rust-dev, and vue-dev for Simplicity First, Surgical Changes, and Goal-Driven Execution."
+
+  # Optional community framework skills (verify availability during install session)
+  vue-best-practices:
+    type: external_optional
+    search_hint: "npx skills find vue"
+  nuxt-seo:
+    type: external_optional
+    search_hint: "npx skills find nuxt"
+  tailwind-css:
+    type: external_optional
+    search_hint: "npx skills find tailwind"
+  shadcn-vue:
+    type: external_optional
+    search_hint: "npx skills find shadcn-vue"
+  playwright-e2e:
+    type: external_optional
+    search_hint: "npx skills find playwright"
+
+  # Custom local skills authored in this repository (skills/<name>/SKILL.md)
+  factory-protocol:
+    type: local
+    path: "./skills/factory-protocol/SKILL.md"
+  rust-axum-sqlx:
+    type: local
+    path: "./skills/rust-axum-sqlx/SKILL.md"
+  web-qa-checklist:
+    type: local
+    path: "./skills/web-qa-checklist/SKILL.md"
+  rust-vue-security:
+    type: local
+    path: "./skills/rust-vue-security/SKILL.md"
+  coolify-deploy:
+    type: local
+    path: "./skills/coolify-deploy/SKILL.md"
+
+bot_assignments:
+  project-manager:
+    required:
+      - orca-cli
+      - orchestration
+      - factory-protocol
+    excluded:
+      - grill-with-docs
+      - karpathy-guidelines
+
+  architect:
+    required:
+      - grill-with-docs
+      - karpathy-guidelines
+      - factory-protocol
+    optional:
+      - grill-me
+
+  ui-designer:
+    required:
+      - frontend-design
+      - orca-cli
+    optional:
+      - tailwind-css
+      - shadcn-vue
+    excluded:
+      - ui-ux-pro-max # Conflicts with anthropics/skills frontend-design
+
+  rust-dev:
+    required:
+      - orchestration
+      - karpathy-guidelines
+      - rust-axum-sqlx
+
+  vue-dev:
+    required:
+      - orchestration
+      - karpathy-guidelines
+    optional:
+      - vue-best-practices
+      - nuxt-seo
+      - shadcn-vue
+      - tailwind-css
+
+  qa-tester:
+    required:
+      - orca-cli
+      - web-qa-checklist
+    optional:
+      - playwright-e2e
+
+  satpam:
+    required:
+      - security-audit
+      - rust-vue-security
+    excluded:
+      - karpathy-guidelines # Keep security auditor focused on Cloudflare 6-phase audit
+
+  devops:
+    required:
+      - orca-cli
+      - coolify-deploy
