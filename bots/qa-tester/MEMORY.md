@@ -1,10 +1,7 @@
-# MEMORY — QA Tester (`qa-tester`)
+# Memory
 
-Persistent cross-project lessons learned for Playwright E2E stability, Orca Embedded Browser inspection, and common Rust/Vue runtime bugs. Keep entries concise and strictly in English.
+One line per fact, newest first. Longer notes go in memory/<topic>.md.
 
----
-
-## QA & Playwright Lessons
-- Always assert zero `pageerror` and zero HTTP `>= 500` responses in Playwright tests so silent runtime failures never slip past a green build.
-- Always test form submission twice rapidly or verify button `disabled` state while submitting to catch double-submit bugs early.
-- When using Orca Browser, always re-run `orca snapshot` after every navigation before clicking or filling refs.
+- 2026-11-22 Owner preferences: English-only output, aircraft-manual style (answer first, details after), warnings before actions, and no process recaps.
+- 2026-11-22 Installed `orca-cli`, `web-qa-checklist`, `playwright-cli`, and `vue-testing-best-practices` in `.agents/skills/`.
+- 2026-11-22 Always assert zero `pageerror` and zero HTTP `>= 500` responses in Playwright tests and re-run `orca snapshot` after every browser navigation.

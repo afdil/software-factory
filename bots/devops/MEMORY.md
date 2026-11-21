@@ -1,10 +1,7 @@
-# MEMORY — DevOps (`devops`)
+# Memory
 
-Persistent cross-project lessons learned for Coolify REST API, GitHub App integration, Traefik SSL provisioning, and Rust `cargo-chef` Docker builds. Keep entries concise and strictly in English.
+One line per fact, newest first. Longer notes go in memory/<topic>.md.
 
----
-
-## Coolify & Docker Lessons
-- Always wait for Coolify PostgreSQL status to become `running` and fetch its `internal_db_url` before triggering the first Rust application deployment (so startup `sqlx::migrate!()` connects cleanly).
-- Verify wildcard DNS (`*.<FACTORY_BASE_DOMAIN>`) resolves to the VPS IP so Coolify/Traefik Let's Encrypt certificates issue automatically on first deploy.
-- Never echo raw env var values in terminal output or `.factory/DEPLOY.json`.
+- 2026-11-22 Owner preferences: English-only output, aircraft-manual style (answer first, details after), warnings before actions, and no process recaps.
+- 2026-11-22 Installed `orca-cli` and `coolify-deploy` in `.agents/skills/`.
+- 2026-11-22 Always verify `QA_REPORT.md` and `SECURITY_REPORT.md` both show `Verdict: PASS`, wait for Coolify PostgreSQL `internal_db_url` before first deploy, and never echo raw secrets.

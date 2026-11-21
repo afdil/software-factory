@@ -1,10 +1,8 @@
-# MEMORY — Architect (`architect`)
+# Memory
 
-Persistent cross-project lessons learned for PostgreSQL schemas, Axum/Vue module slicing, and parallel-safe DAG planning. Keep entries concise and strictly in English.
+One line per fact, newest first. Longer notes go in memory/<topic>.md.
 
----
-
-## Architecture & DAG Lessons
-- Always separate shared wiring (`main.rs`, `routes/mod.rs`, `router/index.ts`, migrations) into serial `M1` foundation tasks before fanning out parallel feature slices in `M2+`.
-- For `saas` projects, always design single-container Axum + static Vue `dist/` routing (`/api/*` reserved for backend; SPA fallback for all other routes).
-- For `landing` projects (`tpl-landing-nuxt`), specify explicit SEO deliverables (meta tags, OG image slot, sitemap, JSON-LD schema) in `SPEC.md`.
+- 2026-11-22 Owner preferences: English-only output, aircraft-manual style (answer first, details after), warnings before actions, and no process recaps.
+- 2026-11-22 Installed `grill-with-docs`, `grill-me`, `karpathy-guidelines`, and `factory-protocol` in `.agents/skills/`.
+- 2026-11-22 Keep shared wiring files (`Cargo.toml`, migrations, `main.rs`, `routes/mod.rs`, `router/index.ts`) serial in `M1` before fanning out disjoint feature slices in `M2+`.
+- 2026-11-22 SaaS apps use single-container Axum + static Vue `dist/` (`/api/*` + SPA fallback); landing pages use `tpl-landing-nuxt` with explicit SEO deliverables.

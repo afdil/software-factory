@@ -14,7 +14,7 @@ notes:
 
 providers:
   gemini:
-    agent_cli: gemini
+    agent_cli: antigravity
     tiers:
       frontier_xhigh:
         label: Gemini 4 Neon (XHigh)

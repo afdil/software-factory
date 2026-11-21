@@ -1,11 +1,7 @@
-# MEMORY — Satpam (`satpam`)
+# Memory
 
-Persistent cross-project security audit lessons learned for Axum, SQLx, Vue 3, Nuxt, and Coolify Docker deployments. Keep entries concise and strictly in English.
+One line per fact, newest first. Longer notes go in memory/<topic>.md.
 
----
-
-## Recurring Vulnerability Patterns to Check First
-- **Axum IDOR:** Handlers extracting `Path(id)` and `AuthUser` but forgetting `AND user_id = $2` in `UPDATE`/`DELETE`/`GET` SQLx queries.
-- **Error Leakage:** `AppError` accidentally returning raw `sqlx::Error` strings (table names, constraints) to API clients instead of logging server-side via `tracing::error!` and returning a safe generic message.
-- **Cookie Flags:** Auth cookies missing `HttpOnly`, `SameSite=Lax`, or conditional `Secure` flag when `APP_URL` starts with `https://`.
-- **Nuxt SSR Hydration Leaks:** Server-only environment variables accidentally placed under `runtimeConfig.public` instead of private `runtimeConfig`.
+- 2026-11-22 Owner preferences: English-only output, aircraft-manual style (answer first, details after), warnings before actions, and no process recaps.
+- 2026-11-22 Installed Cloudflare's `security-audit` skill and custom `rust-vue-security` addendum in `.agents/skills/`.
+- 2026-11-22 Prioritize Axum IDOR (`AND user_id = $2`), raw `sqlx::Error` leaks in `AppError`, session cookie flags (`HttpOnly`, `SameSite`, conditional `Secure`), and Nuxt `runtimeConfig.public` secret exposure.

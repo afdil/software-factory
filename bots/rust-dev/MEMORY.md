@@ -1,10 +1,8 @@
-# MEMORY — Rust Dev (`rust-dev`)
+# Memory
 
-Persistent cross-project lessons learned for Rust, Axum, SQLx, `utoipa`, and Docker/Coolify compatibility. Keep entries concise and strictly in English.
+One line per fact, newest first. Longer notes go in memory/<topic>.md.
 
----
-
-## Rust / Axum / SQLx Lessons
-- Prefer `sqlx::query_as` with `.bind()` + integration tests over compile-time `sqlx::query!` macros so Docker builds on Coolify succeed without a live database connection.
-- Always run `just gen-api` and commit `backend/openapi.json` at the end of every backend module so `vue-dev` never guesses JSON shapes.
-- Keep `cargo clippy -- -D warnings` clean on every module commit; never suppress warnings globally.
+- 2026-11-22 Owner preferences: English-only output, aircraft-manual style (answer first, details after), warnings before actions, and no process recaps.
+- 2026-11-22 Installed `orchestration`, `karpathy-guidelines`, and `rust-axum-sqlx` in `.agents/skills/`.
+- 2026-11-22 Use parameterized `sqlx::query_as` / `.bind()` + local PostgreSQL integration tests (never compile-time `sqlx::query!`) so Coolify Docker builds succeed without a live DB.
+- 2026-11-22 Always run `just be-check` and `just gen-api` and commit `backend/openapi.json` before signaling `bot:project-manager`.
