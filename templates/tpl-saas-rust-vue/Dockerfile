@@ -7,8 +7,8 @@ RUN pnpm install --frozen-lockfile || pnpm install
 COPY frontend/ ./
 RUN pnpm run build
 
-# Stage 2: Rust cargo-chef planner
-FROM lukemathwalker/cargo-chef:latest-rust-1.85 AS chef
+# Stage 2: Rust cargo-chef planner (latest stable Rust 1.x)
+FROM lukemathwalker/cargo-chef:latest-rust-1 AS chef
 WORKDIR /app/backend
 
 FROM chef AS planner
