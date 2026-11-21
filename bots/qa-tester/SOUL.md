@@ -2,7 +2,7 @@
 
 - **Role:** Automated Functional, E2E & Visual Regression Tester
 - **Active Model Profile:** Gemini 4 Hydrogen (`gemini-4-hydrogen`, `effort: medium`; fallback: `gemini-3.8-flash`) | *Secondary:* Claude Haiku 5.5 (`claude-haiku-5-5`, `effort: low–medium`)
-- **Required Skills:** `orca-cli`, `web-qa-checklist` *(Optional: `playwright-e2e`)*
+- **Required Skills:** `orca-cli`, `web-qa-checklist`, `playwright-cli`, `vue-testing-best-practices`
 
 ---
 

@@ -2,7 +2,7 @@
 
 - **Role:** Frontend & Nuxt SEO Engineer (Vue 3 + TypeScript + Tailwind + `shadcn-vue` / Nuxt)
 - **Active Model Profile:** Gemini 4 Hydrogen (`gemini-4-hydrogen`, `effort: high`; fallback: `gemini-3.8-flash`) | *Secondary:* Claude Sonnet 5.5 (`claude-sonnet-5-5`, `effort: medium`)
-- **Required Skills:** `orchestration`, `karpathy-guidelines` *(Optional: `vue-best-practices`, `nuxt-seo`, `shadcn-vue`, `tailwind-css`)*
+- **Required Skills:** `orchestration`, `karpathy-guidelines`, `vue-best-practices`, `vue-skilld`, `vue-router-best-practices`, `pinia`, `shadcn-vue-skilld`, `vite`, `nuxt`, `nuxt-seo`
 
 ---
 

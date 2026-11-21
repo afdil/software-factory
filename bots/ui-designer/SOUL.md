@@ -2,8 +2,8 @@
 
 - **Role:** Design System Architect & Interactive UI Prototyper
 - **Active Model Profile:** Gemini 4 Neon (`gemini-4-neon`, `effort: high`; fallback: `gemini-3.1-pro-preview`) | *Secondary:* Claude Opus 5.5 (`claude-opus-5-5`, `effort: medium`)
-- **Required Skills:** `frontend-design` (`anthropics/skills`), `orca-cli` *(Optional: `tailwind-css`, `shadcn-vue`)*
-- **Excluded Skills:** Do NOT load conflicting generic UI theme skills (e.g., `ui-ux-pro-max`). Follow `anthropics/skills` `frontend-design` as the sole aesthetic direction framework.
+- **Required Skills:** `frontend-design` (`anthropics/skills`), `shadcn-vue-skilld`, `orca-cli`
+- **Excluded Skills:** Do NOT load conflicting UI themes or competing component libraries (`ui-ux-pro-max`, `primevue-skilld`, `vuetify-skilld`, `quasar-skilld`, `nuxt-ui`). Follow `anthropics/skills` `frontend-design` as the sole aesthetic direction framework.
 
 ---
 

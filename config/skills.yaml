@@ -1,8 +1,8 @@
 # Per-Bot Skill Matrix & Installation Sources
-# Run scripts/install-skills.ps1 to install external skills and verify local skills.
+# Run scripts/install-skills.ps1 to install external skills and copy local skills into ~/.agents/skills.
 
 skill_sources:
-  # Built-in Orca Desktop skills (installed via `orca skills install`)
+  # Built-in Orca Desktop skills
   orca-cli:
     type: orca_builtin
     install: "orca skills install orca-cli"
@@ -10,46 +10,59 @@ skill_sources:
     type: orca_builtin
     install: "orca skills install orchestration"
 
-  # External community / official skills
+  # Core external skills (installed globally)
   grill-with-docs:
     type: external
     repo: "https://github.com/mattpocock/skills"
-    install: "npx skills add mattpocock/skills --skill grill-with-docs"
-    optional_companion: "npx skills add mattpocock/skills --skill grill-me"
+    install: "npx.cmd -y skills add mattpocock/skills --skill grill-with-docs --global -y"
+  grill-me:
+    type: external
+    repo: "https://github.com/mattpocock/skills"
+    install: "npx.cmd -y skills add mattpocock/skills --skill grill-me --global -y"
   frontend-design:
     type: external
     repo: "https://github.com/anthropics/skills"
-    install: "npx skills add https://github.com/anthropics/skills --skill frontend-design"
-    notes: "Replaces generic UI design skills (e.g., ui-ux-pro-max) to avoid conflicting design philosophies."
+    install: "npx.cmd -y skills add https://github.com/anthropics/skills --skill frontend-design --global -y"
+    notes: "Sole aesthetic framework for ui-designer; replaces conflicting UI themes."
   security-audit:
     type: external
     repo: "https://github.com/cloudflare/security-audit-skill"
-    install: "npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit"
-    notes: "Cloudflare's 6-phase vulnerability discovery harness."
+    install: "npx.cmd -y skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global -y"
+    notes: "Cloudflare's 6-phase vulnerability discovery harness for satpam."
   karpathy-guidelines:
     type: external
     repo: "https://github.com/multica-ai/andrej-karpathy-skills"
-    install: "npx skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines"
-    notes: "Applied to architect, rust-dev, and vue-dev for Simplicity First, Surgical Changes, and Goal-Driven Execution."
+    install: "npx.cmd -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines --global -y"
+    notes: "Applied to architect, rust-dev, and vue-dev."
 
-  # Optional community framework skills (verify availability during install session)
-  vue-best-practices:
-    type: external_optional
-    search_hint: "npx skills find vue"
-  nuxt-seo:
-    type: external_optional
-    search_hint: "npx skills find nuxt"
-  tailwind-css:
-    type: external_optional
-    search_hint: "npx skills find tailwind"
-  shadcn-vue:
-    type: external_optional
-    search_hint: "npx skills find shadcn-vue"
-  playwright-e2e:
-    type: external_optional
-    search_hint: "npx skills find playwright"
+  # Framework skills (installed from onmax/nuxt-skills, skilld-dev/vue-ecosystem-skills, microsoft/playwright-cli)
+  vue-ecosystem-bundle:
+    type: external
+    repo: "https://github.com/skilld-dev/vue-ecosystem-skills"
+    install: "npx.cmd -y skills add skilld-dev/vue-ecosystem-skills --skill vue-skilld --skill shadcn-vue-skilld --skill pinia-skilld --skill vue-router-skilld --global -y"
+    selected_skills:
+      - vue-skilld
+      - shadcn-vue-skilld
+      - pinia-skilld
+      - vue-router-skilld
+  nuxt-bundle:
+    type: external
+    repo: "https://github.com/onmax/nuxt-skills"
+    install: "npx.cmd -y skills add onmax/nuxt-skills --skill vue-best-practices --skill vue-router-best-practices --skill vue-testing-best-practices --skill pinia --skill vite --skill nuxt --skill nuxt-seo --global -y"
+    selected_skills:
+      - vue-best-practices
+      - vue-router-best-practices
+      - vue-testing-best-practices
+      - pinia
+      - vite
+      - nuxt
+      - nuxt-seo
+  playwright-cli:
+    type: external
+    repo: "https://github.com/microsoft/playwright-cli"
+    install: "npx.cmd -y skills add microsoft/playwright-cli --skill playwright-cli --global -y"
 
-  # Custom local skills authored in this repository (skills/<name>/SKILL.md)
+  # Custom local factory skills (skills/<name>/SKILL.md -> copied to ~/.agents/skills)
   factory-protocol:
     type: local
     path: "./skills/factory-protocol/SKILL.md"
@@ -87,12 +100,14 @@ bot_assignments:
   ui-designer:
     required:
       - frontend-design
+      - shadcn-vue-skilld
       - orca-cli
-    optional:
-      - tailwind-css
-      - shadcn-vue
     excluded:
-      - ui-ux-pro-max # Conflicts with anthropics/skills frontend-design
+      - ui-ux-pro-max
+      - primevue-skilld
+      - vuetify-skilld
+      - quasar-skilld
+      - nuxt-ui
 
   rust-dev:
     required:
@@ -104,25 +119,32 @@ bot_assignments:
     required:
       - orchestration
       - karpathy-guidelines
-    optional:
       - vue-best-practices
+      - vue-skilld
+      - vue-router-best-practices
+      - pinia
+      - shadcn-vue-skilld
+      - vite
+      - nuxt
       - nuxt-seo
-      - shadcn-vue
-      - tailwind-css
+    excluded:
+      - primevue-skilld
+      - vuetify-skilld
+      - quasar-skilld
 
   qa-tester:
     required:
       - orca-cli
       - web-qa-checklist
-    optional:
-      - playwright-e2e
+      - playwright-cli
+      - vue-testing-best-practices
 
   satpam:
     required:
       - security-audit
       - rust-vue-security
     excluded:
-      - karpathy-guidelines # Keep security auditor focused on Cloudflare 6-phase audit
+      - karpathy-guidelines
 
   devops:
     required:

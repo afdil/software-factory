@@ -43,13 +43,15 @@ Invoke-Step -Label "Update / verify Orca built-in skills (orca-cli, orchestratio
         }
     }
 
-# 2. Required External Skills
+# 2. Required External Skills (use npx.cmd on Windows to avoid .ps1 ExecutionPolicy issues)
+$NpxBin = if ($IsWindows -or $env:OS -eq "Windows_NT") { "npx.cmd" } else { "npx" }
+
 $ExternalSkills = @(
-    @{ Name = "grill-with-docs (architect)";     Cmd = "npx -y skills add mattpocock/skills --skill grill-with-docs --global -y" },
-    @{ Name = "grill-me (architect optional)";   Cmd = "npx -y skills add mattpocock/skills --skill grill-me --global -y" },
-    @{ Name = "frontend-design (ui-designer)";   Cmd = "npx -y skills add https://github.com/anthropics/skills --skill frontend-design --global -y" },
-    @{ Name = "security-audit (satpam)";         Cmd = "npx -y skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global -y" },
-    @{ Name = "karpathy-guidelines (devs+arch)"; Cmd = "npx -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines --global -y" }
+    @{ Name = "grill-with-docs (architect)";     Cmd = "$NpxBin -y skills add mattpocock/skills --skill grill-with-docs --global -y" },
+    @{ Name = "grill-me (architect optional)";   Cmd = "$NpxBin -y skills add mattpocock/skills --skill grill-me --global -y" },
+    @{ Name = "frontend-design (ui-designer)";   Cmd = "$NpxBin -y skills add https://github.com/anthropics/skills --skill frontend-design --global -y" },
+    @{ Name = "security-audit (satpam)";         Cmd = "$NpxBin -y skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global -y" },
+    @{ Name = "karpathy-guidelines (devs+arch)"; Cmd = "$NpxBin -y skills add multica-ai/andrej-karpathy-skills --skill karpathy-guidelines --global -y" }
 )
 
 foreach ($skill in $ExternalSkills) {
@@ -89,13 +91,19 @@ foreach ($localName in $LocalSkills) {
 }
 
 if ($IncludeOptional) {
-    Write-Host "`n==> Optional Framework Skills Discovery" -ForegroundColor Magenta
-    Write-Host "Run these commands to pick your preferred community skills for vue-dev, ui-designer, and qa-tester:"
-    Write-Host "  npx skills find vue"
-    Write-Host "  npx skills find nuxt"
-    Write-Host "  npx skills find shadcn-vue"
-    Write-Host "  npx skills find tailwind"
-    Write-Host "  npx skills find playwright"
+    $FrameworkSkills = @(
+        @{ Name = "Vue/shadcn-vue ecosystem (vue-dev, ui-designer)"; Cmd = "$NpxBin -y skills add skilld-dev/vue-ecosystem-skills --skill vue-skilld --skill shadcn-vue-skilld --skill pinia-skilld --skill vue-router-skilld --global -y" },
+        @{ Name = "Nuxt & Vue best practices (vue-dev, qa-tester)";  Cmd = "$NpxBin -y skills add onmax/nuxt-skills --skill vue-best-practices --skill vue-router-best-practices --skill vue-testing-best-practices --skill pinia --skill vite --skill nuxt --skill nuxt-seo --global -y" },
+        @{ Name = "Playwright CLI (qa-tester)";                      Cmd = "$NpxBin -y skills add microsoft/playwright-cli --skill playwright-cli --global -y" }
+    )
+    foreach ($skill in $FrameworkSkills) {
+        $cmd = $skill.Cmd
+        Invoke-Step -Label "Install framework skill: $($skill.Name)" `
+            -Preview $cmd `
+            -Action {
+                Invoke-Expression $cmd
+            }
+    }
 }
 
 Write-Host "`nDone! Verify installed skills with: ls `"$UserSkillsDir`"" -ForegroundColor Green
